@@ -1,10 +1,15 @@
 package com.api;
 
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.testng.annotations.Test;
 import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.Matchers.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.HashMap;
 
 /*
@@ -29,7 +34,7 @@ public class HttpRequest {
 		.then().statusCode(200).body("page", equalTo(8)).log().all();
 	}
 	
-	@Test(priority=2)
+	//@Test(priority=2)
 	void createUsers()
 	{
 		HashMap<String, String> data = new HashMap<String, String>();
@@ -45,7 +50,7 @@ public class HttpRequest {
 		System.out.println("ID IS: " + id); 
 	}
 	
-	@Test(priority=3, dependsOnMethods= {"createUsers"})
+	//@Test(priority=3, dependsOnMethods= {"createUsers"})
 	void updateUsers()
 	{
 		HashMap<String, String> data = new HashMap<String, String>();
@@ -57,6 +62,22 @@ public class HttpRequest {
 		.when().put("https://reqres.in/api/users/"+id)
 		
 		 .then().statusCode(200).log().all();
+		
+	}
+	
+	@Test()
+	void createUsersWithJson() throws FileNotFoundException
+	{
+		File f = new File(".\\demodata.json");
+		FileReader fr = new FileReader(f);
+		JSONTokener jt = new JSONTokener(fr);
+		JSONObject data = new JSONObject(jt);
+		
+		given().contentType("application/json").body(data)
+		
+		.when().post("https://reqres.in/api/users")
+		
+		.then().statusCode(201).log().all();
 		
 	}
 }
